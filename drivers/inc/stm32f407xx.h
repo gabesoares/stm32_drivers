@@ -8,6 +8,9 @@
 #ifndef INC_STM32F407XX_H_
 #define INC_STM32F407XX_H_
 
+#include <stdint.h>
+
+#define __vo volatile
 /*
  * base addresses of flash and SRAM memories
  */
@@ -18,6 +21,7 @@
 #define SRAM1_BASEADDR 			0x20000000U // 112kB size, SRAM2 starts after 112kB
 #define SRAM2_BASEADDR			0x2001C000U // SRAM2 is the auxiliary internal SRAM
 #define ROM 					0x1FFF0000U // also called system memory
+#define SRAM 					SRAM1_BASEADDR // SRAM1 acts as our main SRAM
 
 #define PERIPH_BASEADDR			0x40000000U // base address of all peripherals
 #define APB1PERIPH_BASEADDR		PERIPH_BASE_ADDR // APB1 starts, also is TIM2's CR1 register
@@ -65,7 +69,25 @@
 #define USART6_BASEADDR			(APB2_PERIPH_BASEADDR + 0x1400)
 
 
+/*********************** PERIPHERAL REGISTER DEFINITION STRUCTURE************************/
+// Specific to the STM32F407xx
 
-#define SRAM 					SRAM1_BASEADDR /* SRAM1 acts as our main SRAM
+typedef struct
+{
+	__vo uint32_t MODER;		// Mode Register							Address Offset: 0x00
+	__vo uint32_t OTYPER;		// Output Type Register						Address Offset: 0x04
+	__vo uint32_t OSPEEDR;		// Output Speed Register					Address Offset: 0x08
+	__vo uint32_t PUPDR;		// Pullup Pulldown Register					Address Offset: 0x0C
+	__vo uint32_t IDR;			// Input Data Register						Address Offset: 0x10
+	__vo uint32_t ODR;			// Output Data Register						Address Offset: 0x14
+	__vo uint32_t BSRR;			// Bit Set/Reset Register					Address Offset: 0x18
+	__vo uint32_t LCKR;			// Configuration Lock Register				Address Offset: 0x1C
+	__vo uint32_t AFR[2]; 		// Alternate Function Low/High Register		Address Offset: 0x20-0x24
+	// array of 2 uint32, AFRL register and AFRH register, alternate function low and high
+	// AFR[0]: Low Register, AFR[1]: High Register
+}GPIO_RegDef_t;
+
+
+
 
 #endif /* INC_STM32F407XX_H_ */
