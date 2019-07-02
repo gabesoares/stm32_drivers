@@ -253,7 +253,12 @@ void GPIO_DeInit(GPIO_RegDef_t *pGPIOx)
  */
 uint8_t GPIO_ReadFromInputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber) // returns a 0 or 1
 {
+	uint8_t value;
+	// shift the corresponding bit position all the way to the right so we can read it
+	// read by ANDing with 1 to get rid of everything else
+	value = (uint8_t) ((pGPIOx->IDR >> PinNumber) & 0x00000001 );
 
+	return value;
 }
 
 /***********************************************************
@@ -269,7 +274,11 @@ uint8_t GPIO_ReadFromInputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber) // retur
  */
 uint16_t GPIO_ReadFromInputPort(GPIO_RegDef_t *pGPIOx) // reads from a whole 16 bit port 0s or 1s
 {
+	uint16_t value;
+	// need entire Input Data Readport returned here
+	value = (uint16_t) pGPIOx->IDR;
 
+	return value;
 }
 
 /***********************************************************
@@ -287,7 +296,16 @@ uint16_t GPIO_ReadFromInputPort(GPIO_RegDef_t *pGPIOx) // reads from a whole 16 
  */
 void GPIO_WriteToOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber, uint8_t Value)
 {
-
+	if (Value == GPIO_PIN_SET)
+	{
+		// write 1
+		pGPIOx->ODR |= (1 << PinNumber);
+	}
+	else
+	{
+		// write 0
+		pGPIOx->ODR &= ~(1 << PinNumber);
+	}
 }
 
 /***********************************************************
@@ -304,7 +322,7 @@ void GPIO_WriteToOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber, uint8_t Val
  */
 void GPIO_WriteToOutputPort(GPIO_RegDef_t *pGPIOx, uint16_t Value)
 {
-
+	pGPIOx->ODR = Value;
 }
 
 /***********************************************************
@@ -321,7 +339,8 @@ void GPIO_WriteToOutputPort(GPIO_RegDef_t *pGPIOx, uint16_t Value)
  */
 void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber)
 {
-
+	// bitwise XOR operation
+	pGPIOx->ODR ^= (1 << PinNumber);
 }
 
 
