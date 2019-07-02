@@ -24,10 +24,10 @@
 #define SRAM 					SRAM1_BASEADDR // SRAM1 acts as our main SRAM
 
 #define PERIPH_BASEADDR			0x40000000U // base address of all peripherals
-#define APB1PERIPH_BASEADDR		PERIPH_BASE_ADDR // APB1 starts, also is TIM2's CR1 register
-#define APB2PERIPH_BASEADDR		0x40010000U // APBs are lower speed
-#define AHB1PERIPH_BASEADDR		0x40020000U // AHB (bus) peripherals are higher speed
-#define AHB2PERIPH_BASEADDR		0x50000000U // They do GPIOs and camera interfaces for example
+#define APB1_PERIPH_BASEADDR	PERIPH_BASE_ADDR // APB1 starts, also is TIM2's CR1 register
+#define APB2_PERIPH_BASEADDR	0x40010000U // APBs are lower speed
+#define AHB1_PERIPH_BASEADDR	0x40020000U // AHB (bus) peripherals are higher speed
+#define AHB2_PERIPH_BASEADDR	0x50000000U // They do GPIOs and camera interfaces for example
 
 // GPIO Peripherals on AHB1 bus
 #define GPIOA_BASEADDR			(AHB1_PERIPH_BASEADDR + 0x0000)
@@ -213,5 +213,13 @@ typedef struct
 // Clock Disable Macros for SYSCFG Peripheral
 #define SYSCFG_PCLK_DI()		(RCC->APB2ENR &= ~(1 << 14) )
 
+
+// Some Generic Macros
+#define ENABLE 					1
+#define DISABLE 				0
+#define SET 					ENABLE
+#define RESET 					DISABLE
+#define GPIO_PIN_SET			SET
+#define GPIO_PIN_RESET			RESET
 
 #endif /* INC_STM32F407XX_H_ */
