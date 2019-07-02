@@ -7,6 +7,7 @@
 
 
 #include "stm32f407xx_gpio_driver.h"
+#include "stm32f407xx.h"
 
 /***********************************************************
  * @function 				- GPIO_PeriClockControl
@@ -22,7 +23,84 @@
  */
 void GPIO_PeriClockControl(GPIO_RegDef_t *pGPIOx, uint8_t EnorDi) // user sends a pointer pointing to base address
 {
-
+	if (EnorDi == ENABLE)
+	{
+		if (pGPIOx == GPIOA)
+		{
+			GPIOA_PCLK_EN();
+		}
+		else if (pGPIOx == GPIOB)
+		{
+			GPIOB_PCLK_EN();
+		}
+		else if (pGPIOx == GPIOC)
+		{
+			GPIOC_PCLK_EN();
+		}
+		else if (pGPIOx == GPIOD)
+		{
+			GPIOD_PCLK_EN();
+		}
+		else if (pGPIOx == GPIOE)
+		{
+			GPIOE_PCLK_EN();
+		}
+		else if (pGPIOx == GPIOF)
+		{
+			GPIOF_PCLK_EN();
+		}
+		else if (pGPIOx == GPIOG)
+		{
+			GPIOG_PCLK_EN();
+		}
+		else if (pGPIOx == GPIOH)
+		{
+			GPIOH_PCLK_EN();
+		}
+		else if (pGPIOx == GPIOI)
+		{
+			GPIOI_PCLK_EN();
+		}
+	}
+	else
+	{
+		if (pGPIOx == GPIOA)
+		{
+			GPIOA_PCLK_DI();
+		}
+		else if (pGPIOx == GPIOB)
+		{
+			GPIOB_PCLK_DI();
+		}
+		else if (pGPIOx == GPIOC)
+		{
+			GPIOC_PCLK_DI();
+		}
+		else if (pGPIOx == GPIOD)
+		{
+			GPIOD_PCLK_DI();
+		}
+		else if (pGPIOx == GPIOE)
+		{
+			GPIOE_PCLK_DI();
+		}
+		else if (pGPIOx == GPIOF)
+		{
+			GPIOF_PCLK_DI();
+		}
+		else if (pGPIOx == GPIOG)
+		{
+			GPIOG_PCLK_DI();
+		}
+		else if (pGPIOx == GPIOH)
+		{
+			GPIOH_PCLK_DI();
+		}
+		else if (pGPIOx == GPIOI)
+		{
+			GPIOI_PCLK_DI();
+		}
+	}
 }
 
 /***********************************************************
@@ -38,6 +116,72 @@ void GPIO_PeriClockControl(GPIO_RegDef_t *pGPIOx, uint8_t EnorDi) // user sends 
  */
 void GPIO_Init(GPIO_Handle_t *pGPIOHandle) // user creates a pointer of this type and sends it
 {
+	uint32_t temp = 0; // temporary register
+	//1. configure the mode of GPIO pin
+
+	// non-interrupt modes
+	if (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_ANALOG)
+	{
+		// left shift the PinMode to 2 times the pin number. in pinMode register each pin needs 2 bits for pinmode setting
+		temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
+
+		// clear the bits in the register first. Need to do this to make sure our pin setting works as intended
+		pGPIOHandle->pGPIOx->MODER &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+		pGPIOHandle->pGPIOx->MODER |= temp;
+	}
+	else
+	{
+		// interrupt modes
+	}
+
+	temp = 0;
+	//2. configure the speed
+
+	// left shift the PinSpeed to 2 times the pin number. in pinSpeed register each pin needs 2 bits for speed setting
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinSpeed << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
+
+	// clear the bits in the register first. Need to do this to make sure our pin setting works as intended
+	pGPIOHandle->pGPIOx->OSPEEDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+	pGPIOHandle->pGPIOx->OSPEEDR |= temp;
+
+	temp = 0;
+	//3. configure the PuPd settings
+
+	// left shift the pinPuPd to 2 times the pin number. in pinPuPd register each pin needs 2 bits for PuPd setting
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinPuPdControl << (2 * pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber));
+
+	// clear the bits in the register first. Need to do this to make sure our pin setting works as intended
+	pGPIOHandle->pGPIOx->PUPDR &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+	pGPIOHandle->pGPIOx->PUPDR |= temp;
+
+	temp = 0;
+	//4. configure the output type
+	temp = (pGPIOHandle->GPIO_PinConfig.GPIO_PinOPType <<  pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+
+	// clear the bits in the register first. Need to do this to make sure our pin setting works as intended
+	pGPIOHandle->pGPIOx->OTYPER &= ~(0x1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+	pGPIOHandle->pGPIOx->OTYPER |= temp;
+
+
+	temp = 0;
+	//5. configure the alternate functionality
+	if (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode == GPIO_MODE_ALTFN)
+	{
+		uint8_t temp1, temp2;
+		// do an integer divide to figure out if we're in AFRH (pins 8-15) or AFRL (pins 0-7)
+		// we have an array AFR[2], AFR[0] is AFRL (low register) and AFR[1] is AFRH (high register)
+
+		temp1 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber / 8;
+
+		// do a mod operation to figure out where to start the 4-bit positions for each pin
+		// i.e. in AFRH, pin 8 starts with 4 bits at bit 0, pin 9 at bit 4, pin 10 at bit 8
+		temp2 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber % 8;
+
+		// clear the desired bits in the register first
+		pGPIOHandle->pGPIOx->AFR[temp1] &= ~(0xF << ( 4 * temp2));
+		pGPIOHandle->pGPIOx->AFR[temp1] |= (pGPIOHandle->GPIO_PinConfig.GPIO_PinAltfunMode << ( 4 * temp2));
+
+	}
 
 }
 
@@ -54,7 +198,45 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) // user creates a pointer of this typ
  */
 void GPIO_DeInit(GPIO_RegDef_t *pGPIOx)
 {
+	// can use the RCC AHB1 Peripheral Reset Register RCC_AHB1RSTR
+	// need to write a 1 and after a few clock cycles back to 0
 
+	if (pGPIOx == GPIOA)
+	{
+		GPIOA_REG_RESET();
+	}
+	else if (pGPIOx == GPIOB)
+	{
+		GPIOB_REG_RESET();
+	}
+	else if (pGPIOx == GPIOC)
+	{
+		GPIOC_REG_RESET();
+	}
+	else if (pGPIOx == GPIOD)
+	{
+		GPIOD_REG_RESET();
+	}
+	else if (pGPIOx == GPIOE)
+	{
+		GPIOE_REG_RESET();
+	}
+	else if (pGPIOx == GPIOF)
+	{
+		GPIOF_REG_RESET();
+	}
+	else if (pGPIOx == GPIOG)
+	{
+		GPIOG_REG_RESET();
+	}
+	else if (pGPIOx == GPIOH)
+	{
+		GPIOH_REG_RESET();
+	}
+	else if (pGPIOx == GPIOI)
+	{
+		GPIOI_REG_RESET();
+	}
 }
 
 /***********************************************************
