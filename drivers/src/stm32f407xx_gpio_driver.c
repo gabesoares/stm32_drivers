@@ -129,9 +129,40 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) // user creates a pointer of this typ
 		pGPIOHandle->pGPIOx->MODER &= ~(0x3 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
 		pGPIOHandle->pGPIOx->MODER |= temp;
 	}
-	else
+	else // interrupt modes 4,5,6 input falling, rising, and rising/falling
 	{
-		// interrupt modes
+		if (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_IT_FT)
+		{
+			// 1. Configure the falling trigger selection register (FTSR)
+			EXTI->FTSR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+			// Clear the corresponding RTSR bit to remove rising edge just in case
+			EXTI->RTSR &= ~( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+		}
+		else if (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_IT_RT)
+		{
+			// 1. Configure the rising trigger selection register (RTSR)
+			EXTI->RTSR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+			// Clear the corresponding FTSR bit to remove rising edge just in case
+			EXTI->FTSR &= ~( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+		}
+		else if (pGPIOHandle->GPIO_PinConfig.GPIO_PinMode <= GPIO_MODE_IT_RFT)
+		{
+			// 1. Configure the rising and falling trigger selection register
+			EXTI->RTSR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+
+			EXTI->FTSR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
+		}
+
+		// 2. Configure the GPIO port selection in SYSCFG_EXTICR
+		// Need to do this configuration since different pins/ports are multiplexed through EXTI
+		// There are 16 EXTI multiplexers, EXTI0 has PA0, PB0, PC0... PJ0 all multiplexed to one output
+		// EXTI15 has PA15, PB15, PC15... PJ15 all multiplexed to one output
+		// These 16 EXTI multiplexers have their select lines held in the four EXTICR registers
+
+//		SYSCFG->EXTICR[] |=
+
+		// 3. Enable the EXTI interrupt delivery using IMR
+		EXTI->IMR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);
 	}
 
 	temp = 0;
