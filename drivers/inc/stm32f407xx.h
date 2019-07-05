@@ -270,7 +270,7 @@ typedef struct
  * Returns portcode for a given GPIO port i.e. A is 0000, B is 0001, C is 0010...
  */
 // C conditional or ternary operations:
-// ? means is 'then'. :\ means 'else', the braces at start is an if statement
+// ? means is 'then'. : means 'else','\' means line break, the braces at start is an if statement
 #define GPIO_BASEADDR_TO_CODE(x)  ( (x == GPIOA) ? 0 :\
 									(x == GPIOB) ? 1 :\
 									(x == GPIOC) ? 2 :\
@@ -281,6 +281,21 @@ typedef struct
 									(x == GPIOH) ? 7 :\
 									(x == GPIOI) ? 8 :\
 									(x == GPIOJ) ? 9 :0)
+
+/*
+ * IRQ (Interrupt Request) Numbers for STM32F407x
+ * NOTE: These are super specific to the MCU, look in the interrupt vector table in the reference manual
+ * You can update this list with other peripherals that need interrupts
+ */
+
+#define IRQ_NO_EXTI0				6
+#define IRQ_NO_EXTI1				7
+#define IRQ_NO_EXTI2				8
+#define IRQ_NO_EXTI3				9
+#define IRQ_NO_EXTI4				10
+#define IRQ_NO_EXTI5_9				23
+#define IRQ_NO_EXTI10_15			40
+
 
 // Some Generic Macros
 #define ENABLE 					1
