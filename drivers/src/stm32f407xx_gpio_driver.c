@@ -159,7 +159,18 @@ void GPIO_Init(GPIO_Handle_t *pGPIOHandle) // user creates a pointer of this typ
 		// EXTI15 has PA15, PB15, PC15... PJ15 all multiplexed to one output
 		// These 16 EXTI multiplexers have their select lines held in the four EXTICR registers
 
-//		SYSCFG->EXTICR[] |=
+		// this tells us which of the 4 EXTICR registers to write into
+		uint8_t temp1 = pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber / 4;
+		// this tells us what offset we need in the register to access our pin4
+		uint8_t temp2 = 4 * (pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber % 4);
+
+		uint8_t portcode = GPIO_BASEADDR_TO_CODE(pGPIOHandle->pGPIOx);
+
+		SYSCFG_PCLK_EN(); // ENABLE  SYSCFG peripheral clock
+		// clear bits in registers we plan on changing
+		SYSCFG->EXTICR[temp1] &= ~(0xF << temp2);
+		// set the bits we want to for the EXTI interrupt
+		SYSCFG->EXTICR[temp1] |= portcode << temp2;
 
 		// 3. Enable the EXTI interrupt delivery using IMR
 		EXTI->IMR |= ( 1 << pGPIOHandle->GPIO_PinConfig.GPIO_PinNumber);

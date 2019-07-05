@@ -266,6 +266,21 @@ typedef struct
 #define GPIOJ_REG_RESET()		do{(RCC->AHB1RSTR |= (1 << 9));   (RCC->AHB1RSTR &= ~(1 << 9));} while(0)
 #define GPIOK_REG_RESET()		do{(RCC->AHB1RSTR |= (1 << 10));   (RCC->AHB1RSTR &= ~(1 << 10));} while(0)
 
+/*
+ * Returns portcode for a given GPIO port i.e. A is 0000, B is 0001, C is 0010...
+ */
+// C conditional or ternary operations:
+// ? means is 'then'. :\ means 'else', the braces at start is an if statement
+#define GPIO_BASEADDR_TO_CODE(x)  ( (x == GPIOA) ? 0 :\
+									(x == GPIOB) ? 1 :\
+									(x == GPIOC) ? 2 :\
+									(x == GPIOD) ? 3 :\
+									(x == GPIOE) ? 4 :\
+									(x == GPIOF) ? 5 :\
+									(x == GPIOG) ? 6 :\
+									(x == GPIOH) ? 7 :\
+									(x == GPIOI) ? 8 :\
+									(x == GPIOJ) ? 9 :0)
 
 // Some Generic Macros
 #define ENABLE 					1
