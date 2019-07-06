@@ -11,10 +11,38 @@
 #include <stdint.h>
 
 #define __vo volatile
+
+
+/*************************START: Processor Specific Details***********************************
+ *
+ * ARM Cortex M4 Processor NVIC ISERx Register Addresses (Interrupt Set)
+ */
+
+#define NVIC_ISER0				((__vo uint32_t*)0xE000E100 )
+#define NVIC_ISER1				((__vo uint32_t*)0xE000E104 )
+#define NVIC_ISER2				((__vo uint32_t*)0xE000E108 )
+#define NVIC_ISER3				((__vo uint32_t*)0xE000E10C )
+
+/*
+ * ARM Cortex M4 Processor NVIC ICERx Register Addresses (Interrupt Clear)
+ */
+
+#define NVIC_ICER0				((__vo uint32_t*)0xE000E180 )
+#define NVIC_ICER1				((__vo uint32_t*)0xE000E184 )
+#define NVIC_ICER2				((__vo uint32_t*)0xE000E188 )
+#define NVIC_ICER3				((__vo uint32_t*)0xE000E18C )
+
+
+/*
+ * ARM Cortex M4 Processor NVIC Priority Register Address calculation
+ */
+#define NVIC_PR_BASE_ADDR		((__vo uint32_t*)0xE000E4000)
+
+// specific to each microcontroller. This value is 3 in some TI MCUs
+#define NO_PR_BITS_IMPLEMENTED	4
 /*
  * base addresses of flash and SRAM memories
  */
-
 // base addresses are from STM32F407xx reference manual
 // by default the values are considered signed, so we add U for unsigned int
 #define FLASH_BASEADDR 			0x08000000U // also called main memory
@@ -296,6 +324,25 @@ typedef struct
 #define IRQ_NO_EXTI5_9				23
 #define IRQ_NO_EXTI10_15			40
 
+/*
+ * IRQ PRIORITY LEVEL
+ */
+#define NVIC_IRQ_PRIO0				0
+#define NVIC_IRQ_PRIO1				1
+#define NVIC_IRQ_PRIO2				2
+#define NVIC_IRQ_PRIO3				3
+#define NVIC_IRQ_PRIO4				4
+#define NVIC_IRQ_PRIO5				5
+#define NVIC_IRQ_PRIO6				6
+#define NVIC_IRQ_PRIO7				7
+#define NVIC_IRQ_PRIO8				8
+#define NVIC_IRQ_PRIO9				9
+#define NVIC_IRQ_PRIO10				10
+#define NVIC_IRQ_PRIO11				11
+#define NVIC_IRQ_PRIO12				12
+#define NVIC_IRQ_PRIO13				13
+#define NVIC_IRQ_PRIO14				14
+#define NVIC_IRQ_PRIO15				15
 
 // Some Generic Macros
 #define ENABLE 					1

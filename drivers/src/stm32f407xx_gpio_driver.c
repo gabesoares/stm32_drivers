@@ -391,21 +391,99 @@ void GPIO_ToggleOutputPin(GPIO_RegDef_t *pGPIOx, uint8_t PinNumber)
  */
 
 /***********************************************************
- * @function 				- GPIO_IRQConfig
+ * @function 				- GPIO_IRQInterruptConfig
  *
- * @brief					- This function configures the IRQ registers
+ * @brief					- This function configures the IRQ registers for interrupts
  *
  * @param[in]				- IRQ Number
- * @param[in]				- Priority level for the interrupt
  * @param[in]				- ENABLE or DISABLE macros
  *
  * @return					- None
  *
  * @Note					- None
  */
-void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnorDi)
+void GPIO_IRQInterruptConfig(uint8_t IRQNumber, uint8_t EnorDi)
 {
+	// processor specific! dealing with NVIC. EXTI is on the microcontroller peripheral side
+	// need to look at the ARM Cortex-M4 User Guide document and the NVIC section
+	// enabling/disabling interrupts on a given interrupt
 
+	if (EnorDi == ENABLE)
+	{
+		if (IRQNumber <= 31)
+		{
+			// program ISER0 register in NVIC (interrupt enable)
+			*NVIC_ISER0 |= (1 << IRQNumber);
+		}
+		else if (IRQNumber > 31 && IRQNumber < 64)
+		{
+			// program ISER1 register in NVIC (interrupt enable)
+			*NVIC_ISER1 |= (1 << (IRQNumber % 32));
+		}
+		else if (IRQNumber >= 64 && IRQNumber < 96)
+		{
+			// program ISER2 register in NVIC (interrupt enable)
+			// only 81 interrupts in our STM32F407
+			*NVIC_ISER2 |= (1 << (IRQNumber % 32));
+		}
+	}
+	else
+	{
+		if (IRQNumber <= 31)
+		{
+			// program ICER0 register in NVIC (interrupt clear)
+			*NVIC_ICER0 |= (1 << IRQNumber);
+		}
+		else if (IRQNumber > 31 && IRQNumber < 64)
+		{
+			// program ICER1 register in NVIC (interrupt clear)
+			*NVIC_ICER1 |= (1 << (IRQNumber % 32));
+		}
+		else if (IRQNumber >= 64 && IRQNumber < 96)
+		{
+			// program ICER2 register in NVIC (interrupt clear)
+			// only 81 interrupts in our STM32F407
+			*NVIC_ICER2 |= (1 << (IRQNumber % 32));
+		}
+	}
+}
+
+
+
+
+/***********************************************************
+ * @function 				- GPIO_IRQPriorityConfig
+ *
+ * @brief					- This function configures the priorities for interrupts in IRQ register
+ *
+ * @param[in]				- IRQ Number
+ * @param[in]				- Priority level for the interrupt
+ *
+ * @return					- None
+ *
+ * @Note					- Registers are processor-specific, so are found in the Cortex-M4 User Guide
+ */
+void GPIO_IRQPriorityConfig(uint8_t IRQNumber, uint32_t IRQPriority)
+{
+	// First find out the IPR register (Interrupt Priority Register)
+
+
+	// each IPR register in the NVIC handles 4 different IRQs to set priorities
+	// i.e. in IPR0: IRQ3_PRI IRQ2_PRI IRQ1_PRI IRQ0_PRI, each with 8 bits
+	// i.e. in IPR59 IRQ239_PRI IRQ238_PRI IRQ237_PRI IRQ236_PRI each with 8 bits
+
+	uint8_t iprx = IRQNumber / 4;
+	uint8_t iprx_section = IRQNumber % 4;
+
+	// only upper four bits in each 8 bit section of the register is used to set priority
+	// lower four bits are not used, specific to the microcontroller
+	// in ST case it is 4
+	uint8_t shift_amount = (8 * iprx_section) + (8 - NO_PR_BITS_IMPLEMENTED);
+
+	// adding to base address to get the right register
+	// the next address location is one uint32_t away, since NVIC_PR_BASE_ADDR is a uint32_t pointer
+	// so incrementing the pointer will go to the next address 32 bits away
+	*(NVIC_PR_BASE_ADDR + iprx) |= ( IRQPriority << shift_amount );
 }
 
 /***********************************************************
@@ -421,5 +499,18 @@ void GPIO_IRQConfig(uint8_t IRQNumber, uint8_t IRQPriority, uint8_t EnorDi)
  */
 void GPIO_IRQhandling(uint8_t PinNumber)
 {
+	// EXTI has a Pending Register PR
+	// NVIC also has a Pending Register PR
 
+	// Implement ISR - application-specific
+
+	// clear the EXTI PR register corresponding to the pin number
+	if (EXTI->PR & (1 << PinNumber))
+	{
+		// clear
+		EXTI->PR |= (1 << PinNumber);
+	}
+
+	// store the address of the ISR at the vector address location
+	// corresponding to the IRQ Number for which you have written the ISR
 }
