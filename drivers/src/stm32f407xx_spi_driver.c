@@ -173,6 +173,31 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx)
 }
 
 /***********************************************************
+ * @function 				- SPI_GetFlagStatus
+ *
+ * @brief					- This function returns the status of a desired flag in the SPI Status Register
+ *
+ * @param[in]				- Base address of the SPI port peripheral (SPI1/SPI2/SPI3...)
+ * @param[in]				- Flag Name
+ *
+ * @return					- Whether the flag is set or not: FLAG_SET or FLAG_RESET
+ *
+ * @Note					- None
+ */
+uint8_t SPI_GetFlagStatus(SPI_RegDef_t *pSPIx, uint32_t FlagName)
+{
+	if(pSPIx->SR & FlagName) // testing if the bit position of the flag if 0 or 1
+	{
+		// flags are specified in the SPI header file, from the status register
+		return FLAG_SET;
+	}
+	else
+	{
+		return FLAG_RESET;
+	}
+
+}
+/***********************************************************
  * @function 				- SPI_SendData
  *
  * @brief					- This function sends the desired data over SPI
@@ -183,10 +208,52 @@ void SPI_DeInit(SPI_RegDef_t *pSPIx)
  *
  * @return					- None
  *
- * @Note					- None
+ * @Note					- This is a blocking/polling function
  */
 void SPI_SendData(SPI_RegDef_t *pSPIx, uint8_t *pTxBuffer, uint32_t Len)
 {
+	// blocking API (function call will wait until all the bytes are transmitted)
+	// Waits until Tx buffer is empty (check status register: TXE flag goes high when Tx buffer is empty)
+	// can also do a non-blocking one that uses interrupts
+
+	// Then check DFF, if it's 8-bit load data register with 1 byte
+	// if it's 16 bits need to load data register with 2 byts
+	// then decrement Len and keep loop going till Len = 0
+
+	// SPI data register: if you write to it, the value will go into the Tx buffer
+	// (before you write to it, you need to make sure it's empty. i.e. the TXE flag is high)
+	// if you read from it, you are reading the values from the Rx buffer
+	// (before you read from it, you need to make sure the receive buffer is FULL, RXNE flag is high).
+
+	while (Len > 0)
+	{
+		// 1. Wait until TXE is set (=1)
+		while (SPI_GetFlagStatus(pSPIx, SPI_TXE_FLAG) == FLAG_RESET );
+
+		// 2. Check the DFF bit in CR1
+		if ( (pSPIx->CR1 & (1 << SPI_CR1_DFF) ) ) // if the DFF bit is set to 1
+		{
+			// DFF is 16 bit
+
+			// 1. load the data into the Data Register (DR)
+			// (need to typecast to 16-bit pointer first, then dereference
+			pSPIx->DR = *((uint16_t *) pTxBuffer);
+			// Just sent out 2 bits of data
+			Len--;
+			Len--;
+			// now increment the pointer, typecast to 16 bit first
+			(uint16_t*)pTxBuffer++;
+		}
+		else
+		{
+			// DFF is 8 bit
+			pSPIx->DR = *pTxBuffer;
+			Len--;
+			pTxBuffer++;
+		}
+	}
+
+
 
 }
 

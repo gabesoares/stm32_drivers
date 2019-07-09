@@ -91,6 +91,19 @@ typedef struct
 #define SPI_SSM_DI						0 // default is hardware external chip select
 #define SPI_SSM_EN						1 // software internal chip select management
 
+/*
+ * SPI Related Status Register Flag Definitions
+ */
+#define SPI_RXNE_FLAG					(1 << SPI_SR_RXNE)
+#define SPI_TXE_FLAG					(1 << SPI_SR_TXE)
+#define SPI_CHSIDE_FLAG					(1 << SPI_SR_CHSIDE)
+#define SPI_UDR_FLAG					(1 << SPI_SR_UDR)
+#define SPI_CRCERR_FLAG					(1 << SPI_SR_CRCERR)
+#define SPI_MODF_FLAG					(1 << SPI_SR_MODF)
+#define SPI_OVR_FLAG					(1 << SPI_SR_OVR)
+#define SPI_BSY_FLAG					(1 << SPI_SR_BSY)
+#define SPI_FRE_FLAG					(1 << SPI_SR_FRE)
+
 /**************************************************************************************************
  * 									APIs Supported by this Driver
  * 					For more information about the APIs check the function definitions
