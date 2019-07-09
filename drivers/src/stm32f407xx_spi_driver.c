@@ -78,6 +78,9 @@ void SPI_Init(SPI_Handle_t *pSPIHandle) // user creates a pointer of this type a
 {
 	uint32_t tempreg = 0;
 
+	// enable peripheral clock
+	SPI_PeriClockControl(pSPIHandle->pSPIx, ENABLE);
+
 	// 1. Configure the device mode
 	// Make the MCU as a master to be able to produce a serial clock
 	// MSTR bit in CR1 register needs to be set to 1 (device mode)
@@ -275,6 +278,53 @@ void SPI_ReceiveData(SPI_RegDef_t *pSPIx, uint8_t *pRxBuffer, uint32_t Len)
 
 }
 
+/***********************************************************
+ * @function 				- SPI_PeripheralControl
+ *
+ * @brief					- This function enables or disables the SPIx peripheral
+ *
+ * @param[in]				- Base address of the SPI port peripheral (SPI1/SPI2/SPI3...)
+ * @param[in]				- Enable or Disable macro
+ *
+ * @return					- None
+ *
+ * @Note					- Enables the SPE bit of the SPI_CR1 register
+ */
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		pSPIx->CR1 |= (1 << SPI_CR1_SPE);
+	}
+	else
+	{
+		pSPIx->CR1 &= ~(1 << SPI_CR1_SPE);
+	}
+}
+
+/***********************************************************
+ * @function 				- SPI_SSIConfig
+ *
+ * @brief					- This function sets or resets the SSI pin for software slave management (SSM)
+ *
+ * @param[in]				- Base address of the SPI port peripheral (SPI1/SPI2/SPI3...)
+ * @param[in]				- Enable or Disable macro
+ *
+ * @return					- None
+ *
+ * @Note					- Enables the SSI bit of the SPI_CR1 register
+ */
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi)
+{
+	if (EnorDi == ENABLE)
+	{
+		pSPIx->CR1 |= (1 << SPI_CR1_SSI);
+	}
+	else
+	{
+		pSPIx->CR1 &= ~(1 << SPI_CR1_SSI);
+	}
+}
 /*
  * IRQ Configuration and ISR Handling
  */
@@ -392,11 +442,13 @@ void SPI_IRQhandling(SPI_Handle_t *pHandle)
 	// Implement ISR - application-specific
 
 	// clear the EXTI PR register corresponding to the pin number
+	/*
 	if (EXTI->PR & (1 << PinNumber))
 	{
 		// clear
 		EXTI->PR |= (1 << PinNumber);
 	}
+	*/
 
 	// store the address of the ISR at the vector address location
 	// corresponding to the IRQ Number for which you have written the ISR

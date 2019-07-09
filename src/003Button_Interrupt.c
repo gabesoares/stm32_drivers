@@ -19,7 +19,7 @@ int main(void)
 {
 
 	GPIO_Handle_t GpioLed, GPIOBtn;
-	// set each member of structure to 0
+	// set/initialize each member of structure to 0
 	memset(&GpioLed, 0, sizeof(GpioLed));
 	memset(&GPIOBtn, 0, sizeof(GPIOBtn));
 

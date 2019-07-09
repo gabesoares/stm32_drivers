@@ -117,6 +117,10 @@ void GPIO_PeriClockControl(GPIO_RegDef_t *pGPIOx, uint8_t EnorDi) // user sends 
 void GPIO_Init(GPIO_Handle_t *pGPIOHandle) // user creates a pointer of this type and sends it
 {
 	uint32_t temp = 0; // temporary register
+
+	// enable the peripheral clock
+	GPIO_PeriClockControl(pGPIOHandle->pGPIOx, ENABLE);
+
 	//1. configure the mode of GPIO pin
 
 	// non-interrupt modes

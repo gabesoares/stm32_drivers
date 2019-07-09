@@ -55,13 +55,13 @@ typedef struct
  * Configure the baud rate, 3 bits to pick the divider to divide the APB bus clock
  */
 #define SPI_SCLK_SPEED_DIV2				0			// F_clock (APB clock) divided by 2
-#define SPI_SCLK_SPEED_DIV2				1			// F_clock (APB clock) divided by 4
-#define SPI_SCLK_SPEED_DIV2				2			// F_clock (APB clock) divided by 8
-#define SPI_SCLK_SPEED_DIV2				3			// F_clock (APB clock) divided by 16
-#define SPI_SCLK_SPEED_DIV2				4			// F_clock (APB clock) divided by 32
-#define SPI_SCLK_SPEED_DIV2				5			// F_clock (APB clock) divided by 64
-#define SPI_SCLK_SPEED_DIV2				6			// F_clock (APB clock) divided by 128
-#define SPI_SCLK_SPEED_DIV2				7			// F_clock (APB clock) divided by 256
+#define SPI_SCLK_SPEED_DIV4				1			// F_clock (APB clock) divided by 4
+#define SPI_SCLK_SPEED_DIV8				2			// F_clock (APB clock) divided by 8
+#define SPI_SCLK_SPEED_DIV16			3			// F_clock (APB clock) divided by 16
+#define SPI_SCLK_SPEED_DIV32			4			// F_clock (APB clock) divided by 32
+#define SPI_SCLK_SPEED_DIV64			5			// F_clock (APB clock) divided by 64
+#define SPI_SCLK_SPEED_DIV128			6			// F_clock (APB clock) divided by 128
+#define SPI_SCLK_SPEED_DIV256			7			// F_clock (APB clock) divided by 256
 
 /*
  * @SPI_DFF
@@ -135,4 +135,7 @@ void SPI_IRQhandling(SPI_Handle_t *pHandle);
 /*
  * Other Peripheral Control APIs
  */
+void SPI_PeripheralControl(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
+void SPI_SSIConfig(SPI_RegDef_t *pSPIx, uint8_t EnorDi);
+
 #endif /* INC_STM32F407XX_SPI_DRIVER_H_ */
