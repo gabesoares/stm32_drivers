@@ -57,12 +57,12 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.288446644.1592021974" name="004SPI_Tx_Testing.c" rcbsApplicability="disable" resourcePath="src/004SPI_Tx_Testing.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.187920104.514430894">
-						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.187920104.514430894" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.187920104"/>
+					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.288446644.2101303560" name="005SPI_TxOnly_Arduino.c" rcbsApplicability="disable" resourcePath="src/005SPI_TxOnly_Arduino.c" toolsToInvoke="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.187920104.494044680">
+						<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.187920104.494044680" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.187920104"/>
 					</fileInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="drivers"/>
-						<entry excluding="004SPI_Tx_Testing.c|003Button_Interrupt.c|002LED_Button.c|001LED_Toggle.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="005SPI_TxOnly_Arduino.c|004SPI_Tx_Testing.c|003Button_Interrupt.c|002LED_Button.c|001LED_Toggle.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 					</sourceEntries>
 				</configuration>
