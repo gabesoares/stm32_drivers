@@ -86,6 +86,10 @@ int main(void)
 	// Send Data
 	SPI_SendData(SPI2, (uint8_t*)user_data, strlen(user_data)); // user_data is of char type pointer, typecast to uint8_t pointer
 
+	// wait until the last bit is transmitted successfully before abruptly closing the peripheral
+	// check to make sure BUSY (BSY) flag is low, i.e. SPI is not busy
+	while(SPI_GetFlagStatus(SPI2, SPI_BSY_FLAG));
+
 	SPI_PeripheralControl(SPI2, DISABLE);
 
 	while(1);
