@@ -9,6 +9,8 @@
 #include <string.h>
 #include "stm32f407xx.h"
 
+extern void initialise_monitor_handles();
+
 // Command codes that the Arduino understands
 #define COMMAND_LED_CTRL			0x50
 #define COMMAND_SENSOR_READ			0x51
@@ -112,6 +114,9 @@ int main(void)
 {
 	uint8_t dummywrite = 0xFF;
 	uint8_t dummyread;
+
+	initialise_monitor_handles(); // semihosting enable
+	printf("Application is running\n");
 	// Need to configure GPIO pins as alternate functionality for SPI2 first!
 	// PB15 --> SPI2_MOSI
 	// PB14 --> SPI2_MISO
@@ -122,6 +127,7 @@ int main(void)
 	// WAIT TILL BUTTON IS PRESSED
 	// this function is used to initialize GPIO pins as SPI2 pins
 	SPI2_GPIOInits();
+	printf("SPI Initialized\n");
 
 	GPIO_ButtonInit();
 
@@ -213,6 +219,7 @@ int main(void)
 			// Now send some dummy bits (1 byte) to fetch the response from the slave.
 			SPI_SendData(SPI2, &dummywrite, 1); // we will be receiving during this time as well
 			SPI_ReceiveData(SPI2, &analog_read, 1); // let's read what was in the receive buffer
+			printf("COMMAND_SENSOR_READ %d\n", analog_read);
 		}
 
 		// 3. 	COMMAND_LED_READ 		<pin no(1)>
@@ -248,6 +255,7 @@ int main(void)
 			// Now send some dummy bits (1 byte) to fetch the response from the slave.
 			SPI_SendData(SPI2, &dummywrite, 1); // we will be receiving during this time as well
 			SPI_ReceiveData(SPI2, &led_read, 1); // let's read what was in the receive buffer
+			printf("COMMAND_LED_READ %d\n", led_read);
 		}
 
 		// 4. 	COMMAND_PRINT 		<data_to_print>
@@ -302,14 +310,18 @@ int main(void)
 
 		if (SPI_VerifyResponse(ackbyte))
 		{
-			uint8_t arduino_id;
+			uint8_t arduino_id[10];
 			// Dummy write to get the ID back from the arduino
 			for (int i = 0; i < 10; i++)
 			{
 				SPI_SendData(SPI2, &dummywrite, 1);
 				// read the ID
-				SPI_ReceiveData(SPI2, &arduino_id, 1);
+				SPI_ReceiveData(SPI2, &arduino_id[i], 1);
 			}
+
+
+			printf("COMMAND_ID : %s \n", arduino_id);
+
 
 		}
 
@@ -319,6 +331,7 @@ int main(void)
 		while(SPI_GetFlagStatus(SPI2, SPI_BSY_FLAG));
 
 		SPI_PeripheralControl(SPI2, DISABLE);
+		printf("SPI Communication Closed\n");
 	}
 
 
